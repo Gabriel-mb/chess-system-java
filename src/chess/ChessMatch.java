@@ -8,7 +8,6 @@ import chess.pieces.Rook;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class ChessMatch {
 
@@ -16,6 +15,7 @@ public class ChessMatch {
     private Color currentPlayer;
     private Board board;
     private boolean check;
+    private boolean checkMate;
     private List<Piece> piecesOnTheBoard = new ArrayList<>();
     private List<Piece> capturedPieces = new ArrayList<>();
 
@@ -35,6 +35,10 @@ public class ChessMatch {
     }
     public boolean getCheck(){
         return check;
+    }
+
+    public boolean getCheckMate() {
+        return checkMate;
     }
 
     public ChessPiece[][] getPieces() {
@@ -63,8 +67,13 @@ public class ChessMatch {
             undoMove(source,target,capturedPiece);
             throw new ChessException("You can't put yourself in check");
         }
-        check = (testCheck(opponent(currentPlayer))) ? true : false;
-        nextTurn();
+        check = testCheck(opponent(currentPlayer));
+        if (testCheckMate(opponent(currentPlayer))){
+            checkMate = true;
+        }
+        else {
+            nextTurn();
+        }
         return (ChessPiece) capturedPiece;
     }
 
@@ -131,6 +140,30 @@ public class ChessMatch {
             }
         }
         return false;
+    }
+    private boolean testCheckMate(Color color){
+        if (!testCheck(color)){
+            return false;
+        }
+        List<Piece> list = piecesOnTheBoard.stream().filter(x -> ((ChessPiece)x).getColor() == color).toList();
+        for (Piece p : list){
+            boolean[][] mat = p.possibleMoves();
+            for (int i = 0; i < board.getRows(); i++) {
+                for (int j = 0; j < board.getColumns(); j++) {
+                    if (mat[i][j]) {
+                        Position source = ((ChessPiece)p).getChessPosition().toPosition();
+                        Position target = new Position(i,j);
+                        Piece capturedPiece = makeMove(source,target);
+                        boolean testCheck = testCheck(color);
+                        undoMove(source,target,capturedPiece);
+                        if (!testCheck) {
+                            return false;
+                        }
+                    }
+                }
+            }
+        }
+        return true;
     }
 
     private void placeNewPiece(char column, int row, ChessPiece piece) {
