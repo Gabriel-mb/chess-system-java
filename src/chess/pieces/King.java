@@ -26,7 +26,7 @@ public class King extends ChessPiece {
     }
     private boolean testRookCastling(Position position){
         ChessPiece p = (ChessPiece)getBoard().piece(position);
-        return p != null && p instanceof Rook && p.getColor() == getColor() && p.getMoveCount() == 0;
+        return p instanceof Rook && p.getColor() == getColor() && p.getMoveCount() == 0;
     }
 
     @Override
@@ -76,7 +76,7 @@ public class King extends ChessPiece {
         }
         //Castling
         if (getMoveCount() == 0 && !chessMatch.getCheck()) {
-            // #specialmove castling kingside rook
+            // #specialmove castling kingSide rook
             Position posT1 = new Position(position.getRow(), position.getColumn() + 3);
             if (testRookCastling(posT1)){
                 Position p1 = new Position(position.getRow(), position.getColumn() + 1);
@@ -85,9 +85,9 @@ public class King extends ChessPiece {
                     mat[position.getRow()][position.getColumn() + 2] = true;
                 }
             }
-            // #specialmove castling queenside rook
+            // #specialmove castling queenSide rook
             Position posT2 = new Position(position.getRow(), position.getColumn() - 4);
-            if (testRookCastling(posT1)){
+            if (testRookCastling(posT2)){
                 Position p1 = new Position(position.getRow(), position.getColumn() - 1);
                 Position p2 = new Position(position.getRow(), position.getColumn() - 2);
                 Position p3 = new Position(position.getRow(), position.getColumn() - 3);
